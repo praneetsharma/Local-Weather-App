@@ -1,2 +1,20 @@
 body {
 }
+
+body .container {
+  width: 40%;
+}
+
+.weather-main {
+  font-size: 29px;
+  font-weight: bold;
+}
+
+.temperature-unit {
+  color: blue;
+}
+
+.wi {
+  color: blue;
+  font-size: 60px;  
+}

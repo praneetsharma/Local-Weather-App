@@ -18,6 +18,16 @@ $(document).ready(function() {
     "Clouds": "clouds"
   };
 
+  var myWeather_icon_map = {
+    "thunderstorm": "wi-thunderstorm",
+    "drizzle": "wi-sprinkle",
+    "rain": "wi-rain",
+    "snow": "wi-snow",
+    "haze": "wi-day-haze",
+    "sunny": "wi-day-sunny",
+    "clouds": "wi-cloudy"
+  };
+
   // hash map of what background color to choose
   // given the weather type
   var weather_backColor_map = {
@@ -41,11 +51,19 @@ $(document).ready(function() {
   }
 
   function toggleTemperatureUnit () {
-    if (TEMPERATURE_UNIT === TEMPERATURE_UNIT_MAP.celcius) {
-      TEMPERATURE_UNIT = TEMPERATURE_UNIT_MAP.farenheit;
+    var tempUnit = $(".temperature-unit").text();
+    var tempVal = $(".temperature-value").text();
+
+    if (tempUnit === TEMPERATURE_UNIT_MAP.celcius) {
+      tempUnit = TEMPERATURE_UNIT_MAP.farenheit;
+      tempVal = celciusToFarenheit(tempVal);
     } else {
-      TEMPERATURE_UNIT = TEMPERATURE_UNIT_MAP.celcius;
+      tempUnit = TEMPERATURE_UNIT_MAP.celcius;
+      tempVal = farenheitToCelcius(tempVal);
     }
+
+    $(".temperature-unit").html(tempUnit);
+    $(".temperature-value").html(tempVal);
   }
 
   // converts kelvin to celcius and rounds off to 2 decimal places
@@ -81,6 +99,11 @@ $(document).ready(function() {
     console.warn(positionError.code + ":" + positionError.message);
   }
 
+  function buildIconElement (weatherType) {
+    var iconElem = "<i class='wi " + myWeather_icon_map[weatherType] + "'></i>";
+    return iconElem;
+  }
+
   function getWeatherInfo (url_) {
     $.ajax({
       url: url_,
@@ -91,6 +114,8 @@ $(document).ready(function() {
         $(".weather-type").html(result.weather[0].main);
         $(".temperature-value").html(kelvinToCelcius(result.main.temp));
         $(".temperature-unit").html(TEMPERATURE_UNIT);
+
+        $(".weather-icon").html(buildIconElement(openWeather_myWeather_map[result.weather[0].main]))
       },
       error: function (err) {
         alert(err.code + ":" + err.message);
@@ -99,5 +124,12 @@ $(document).ready(function() {
   }
 
   getLocation();
+
+
+  $(".temperature-unit")
+    .click(toggleTemperatureUnit)
+    .hover(function() {
+      $(this).css('cursor','pointer');
+    });
 
 });
