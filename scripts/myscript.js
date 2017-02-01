@@ -18,6 +18,7 @@ $(document).ready(function() {
     "Clouds": "clouds"
   };
 
+  // Mapping of weather type to weather icon
   var myWeather_icon_map = {
     "thunderstorm": "wi-thunderstorm",
     "drizzle": "wi-sprinkle",
@@ -40,20 +41,25 @@ $(document).ready(function() {
     "clouds": "#E5E7E9"
   };
 
+  // Temperature units supported
   var TEMPERATURE_UNIT_MAP = {
     "celcius": "C",
     "farenheit": "F"
   };
-  var TEMPERATURE_UNIT = TEMPERATURE_UNIT_MAP.celcius;
+  var TEMPERATURE_UNIT = TEMPERATURE_UNIT_MAP.celcius; // default temperature unit
 
+  // Given the openWeather type, return the background color to be set for body
   function getBackgroundColor(type) {
     return weather_backColor_map[openWeather_myWeather_map[type]];
   }
 
+  // Toggle the temperature unit and its value
   function toggleTemperatureUnit () {
     var tempUnit = $(".temperature-unit").text();
     var tempVal = $(".temperature-value").text();
 
+    // based on the current temperature unit, converting from one temperature
+    // unit to another
     if (tempUnit === TEMPERATURE_UNIT_MAP.celcius) {
       tempUnit = TEMPERATURE_UNIT_MAP.farenheit;
       tempVal = celciusToFarenheit(tempVal);
@@ -64,6 +70,11 @@ $(document).ready(function() {
 
     $(".temperature-unit").html(tempUnit);
     $(".temperature-value").html(tempVal);
+  }
+
+  function buildIconElement (weatherType) {
+    var iconElem = "<i class='wi " + myWeather_icon_map[weatherType] + "'></i>";
+    return iconElem;
   }
 
   // converts kelvin to celcius and rounds off to 2 decimal places
@@ -81,41 +92,44 @@ $(document).ready(function() {
     return ((5.0 / 9.0) * (fn - 32.0)).toFixed(2);
   }
 
+  // Function that gets the current position. On success, requestWeatherInfo
+  // callback function is called
   function getLocation () {
-    navigator.geolocation.getCurrentPosition(successGetLocation, errorGetLocation);
+    navigator.geolocation.getCurrentPosition(requestWeatherInfo, errorGetLocation);
   }
-  function successGetLocation (position) {
+
+  // Function to request the weather info
+  function requestWeatherInfo (position) {
     var latitude = position.coords.latitude;
     var longitude = position.coords.longitude;
 
     latitude = latitude.toFixed(1); // rounding off to single decimal
     longitude = longitude.toFixed(1); // rounding off to single decimal
 
+    // Build request url (openweathermap API being used)
     var url = BASE_URL + "?lat=" + latitude + "&lon=" + longitude + "&APPID=" + APP_KEY;
 
     getWeatherInfo(url);
   }
-  function errorGetLocation (positionError) {
-    console.warn(positionError.code + ":" + positionError.message);
-  }
 
-  function buildIconElement (weatherType) {
-    var iconElem = "<i class='wi " + myWeather_icon_map[weatherType] + "'></i>";
-    return iconElem;
-  }
-
+  // Makes ajax request using input URL to get different kinds of weather info
+  // Based on the response received, it sets temperature value, temperature unit,
+  // weather icon, and background color as well.
   function getWeatherInfo (url_) {
     $.ajax({
       url: url_,
       success: function (result) {
 
-        $("body").css("background-color", getBackgroundColor(result.weather[0].main));
+        var weatherType = result.weather[0].main;
 
-        $(".weather-type").html(result.weather[0].main);
+        // Set background color based on the weather type received
+        $("body").css("background-color", getBackgroundColor(weatherType));
+
+        $(".weather-type").html(weatherType);
         $(".temperature-value").html(kelvinToCelcius(result.main.temp));
         $(".temperature-unit").html(TEMPERATURE_UNIT);
 
-        $(".weather-icon").html(buildIconElement(openWeather_myWeather_map[result.weather[0].main]))
+        $(".weather-icon").html(buildIconElement(openWeather_myWeather_map[weatherType]));
       },
       error: function (err) {
         alert(err.code + ":" + err.message);
@@ -123,9 +137,17 @@ $(document).ready(function() {
     });
   }
 
+  function errorGetLocation (positionError) {
+    console.warn(positionError.code + ":" + positionError.message);
+  }
+
+
+
+
+  // ALL MAGIC HAPPENS FROM HERE
   getLocation();
 
-
+  // temperature value and type toggle on click
   $(".temperature-unit")
     .click(toggleTemperatureUnit)
     .hover(function() {

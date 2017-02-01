@@ -1,20 +1,39 @@
 body {
+  color: white;
 }
 
 body .container {
-  width: 40%;
+  width: 50%;
+  margin-top: 10%;
+  background-color: black;
+  opacity: 0.8;
+  box-shadow: 0 6px 18px 0 rgba(0, 0, 0, 0.2), 0 8px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.rows {
+  padding: 5% 5% 7% 5%;
 }
 
 .weather-main {
   font-size: 29px;
   font-weight: bold;
+  margin-top: 10%;
+}
+
+.weather-icon {
+  margin-top: 10%;
+  margin-bottom: 5%;
 }
 
 .temperature-unit {
-  color: blue;
+  color: white;
+  background-color: #E74C3C;
+  padding: 0 6px 0 6px;
+  border-radius: 5px;
 }
 
 .wi {
   color: blue;
-  font-size: 60px;  
+  color: #00FF00;
+  font-size: 60px;
 }
